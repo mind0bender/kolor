@@ -38,6 +38,9 @@ io.on("connection", (user: Socket): void => {
     if (color.b < 0) globalColor.b = 0;
     user.broadcast.emit("post", color);
   });
+  user.on("get", (): void => {
+    user.emit("post", globalColor);
+  });
   logger.info(`++ user connected: ${user.id}`);
   user.on("disconnect", (): void => {
     logger.info(`-- user disconnected: ${user.id}`);
