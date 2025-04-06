@@ -1,17 +1,17 @@
 import express, { type Express } from "express";
 import { createServer, type Server as HTTPServer } from "http";
 import { PORT } from "./utils/const";
-import { Server, Socket } from "socket.io";
+import { Server, type Socket } from "socket.io";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import logger from "./utils/logger";
-import { Color, generateRandomColor, rgbToHex } from "./utils/color";
+import { type Color, generateRandomPastelColor, rgbToHex } from "./utils/color";
 
 const app: Express = express();
 const server: HTTPServer = createServer(app);
 
-const globalColor: Color = generateRandomColor();
+const globalColor: Color = generateRandomPastelColor();
 
 app.use(cors());
 app.use(helmet());
@@ -27,6 +27,7 @@ const io: Server = new Server(server, {
 });
 
 io.on("connection", (user: Socket): void => {
+  user.emit("post", globalColor);
   user.on("post", (color: Color): void => {
     logger.info(`user ${user.id} changed color: ${rgbToHex(color)}`);
     globalColor.r = color.r % 255;
@@ -36,10 +37,6 @@ io.on("connection", (user: Socket): void => {
     if (color.g < 0) globalColor.g = 0;
     if (color.b < 0) globalColor.b = 0;
     user.broadcast.emit("post", color);
-  });
-  user.on("get", (): void => {
-    logger.info(`user ${user.id} requested color`);
-    user.emit("post", globalColor);
   });
   logger.info(`++ user connected: ${user.id}`);
   user.on("disconnect", (): void => {
