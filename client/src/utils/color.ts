@@ -4,14 +4,6 @@ export interface Color {
   b: number;
 }
 
-export function generateRandomColor(): Color {
-  return {
-    r: Math.floor(Math.random() * 256),
-    g: Math.floor(Math.random() * 256),
-    b: Math.floor(Math.random() * 256),
-  };
-}
-
 export function rgbToHex(color: Color): string {
   const { r, g, b } = color;
   const hex: number = (r << 16) | (g << 8) | b;
@@ -25,4 +17,10 @@ export function hexToRgb(hex: string): Color {
     g: (hexNumber >> 8) & 0xff,
     b: hexNumber & 0xff,
   };
+}
+
+export function contrastColor(color: Color): string {
+  const { r, g, b } = color;
+  const brightness: number = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? "#000000" : "#FFFFFF";
 }
